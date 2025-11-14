@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SJF CPU Scheduling Simulator</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://rsms.me">
+  <link href="https://rsms.me/inter/inter.css" rel="stylesheet">
+
+  <style>
+    html { font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    #gantt-chart { min-height: 3.5rem; }
+    #gantt-time { height: 1.25rem; }
+    .gantt-time-relative { position: relative; }
+  </style>
+</head>
+
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+  <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-indigo-600 to-purple-700 p-6">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-white text-center">SJF (Non-Preemptive) CPU Scheduling Simulator</h1>
+      <p class="text-center text-indigo-100 mt-1">With Arrival Time</p>
+    </div>
+
+    <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+
+      <!-- Left Panel -->
+      <div class="flex flex-col gap-6">
+
+        <!-- Input -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Add Process</h2>
+
+          <form id="add-process-form" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Burst Time</label>
+              <input id="burst-time" type="number" min="1" step="1" required
+                     class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Arrival Time</label>
+              <input id="arrival-time" type="number" min="0" step="1" required
+                     class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
+            </div>
+
+            <div>
+              <button type="submit"
+                      class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700">
+                Add
+              </button>
+            </div>
+          </form>
+
+          <p id="error-message" class="text-red-500 text-sm mt-3"></p>
+        </div>
+
+        <!-- Process Table -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 flex-grow">
+          <h2 class="text-xl font-semibold text-gray-800 mb-3">Process Queue</h2>
+
+          <div class="overflow-x-auto max-h-80 overflow-y-auto">
+            <table class="w-full min-w-[480px]">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2">Process</th>
+                  <th class="px-4 py-2">Burst</th>
+                  <th class="px-4 py-2">Arrival</th>
+                </tr>
+              </thead>
+              <tbody id="process-list-body" class="bg-white divide-y divide-gray-200">
+                <tr id="no-process-row">
+                  <td colspan="3" class="px-4 py-3 text-center text-gray-500">No processes yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="flex gap-3 mt-4">
+            <button id="run-simulation" disabled
+                    class="flex-1 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700">
+              Run Simulation
+            </button>
+            <button id="reset-simulation" disabled
+                    class="flex-1 bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700">
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Panel -->
+      <div id="output-section" class="flex flex-col gap-6 hidden">
+
+        <!-- Gantt Chart -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+          <h2 class="text-xl font-semibold mb-4">Gantt Chart</h2>
+          <div id="gantt-chart" class="w-full flex h-14 rounded-lg overflow-hidden border-2 bg-gray-200"></div>
+          <div id="gantt-time" class="relative w-full mt-2 text-sm font-medium h-6 gantt-time-relative"></div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 overflow-x-auto">
+          <h2 class="text-xl font-semibold mb-4">Simulation Results</h2>
+
+          <table class="w-full min-w-[640px]">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="px-4 py-2">Process</th>
+                <th class="px-4 py-2">Burst</th>
+                <th class="px-4 py-2">Arrival</th>
+                <th class="px-4 py-2">Start</th>
+                <th class="px-4 py-2">Completion</th>
+                <th class="px-4 py-2">Turnaround</th>
+                <th class="px-4 py-2">Waiting</th>
+              </tr>
+            </thead>
+            <tbody id="results-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+
+        <!-- Averages -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+          <h2 class="text-xl font-semibold mb-4">Average Statistics</h2>
+          <div id="average-results" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCRIPT -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+
+      let processes = [];
+      let processIdCounter = 1;
+
+      // DOM references
+      const addForm = document.getElementById("add-process-form");
+      const btInput = document.getElementById("burst-time");
+      const atInput = document.getElementById("arrival-time");
+
+      const errorMessage = document.getElementById("error-message");
+      const processListBody = document.getElementById("process-list-body");
+      const noProcessRow = document.getElementById("no-process-row");
+
+      const runBtn = document.getElementById("run-simulation");
+      const resetBtn = document.getElementById("reset-simulation");
+
+      const outputSection = document.getElementById("output-section");
+      const ganttChart = document.getElementById("gantt-chart");
+      const ganttTime = document.getElementById("gantt-time");
+      const resultsTableBody = document.getElementById("results-table-body");
+      const averageResults = document.getElementById("average-results");
+
+      const COLORS = [
+        "bg-blue-600", "bg-green-600", "bg-red-600", "bg-purple-600",
+        "bg-yellow-500", "bg-pink-500", "bg-teal-600", "bg-orange-500"
+      ];
+
+      // Refresh table UI
+      function refreshProcessList() {
+        processListBody.innerHTML = "";
+        if (processes.length === 0) {
+          processListBody.appendChild(noProcessRow);
+          runBtn.disabled = true;
+          resetBtn.disabled = true;
+          return;
+        }
+
+        processes.forEach(p => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-3">${p.id}</td>
+            <td class="px-4 py-3">${p.burst}</td>
+            <td class="px-4 py-3">${p.arrival}</td>
+          `;
+          processListBody.appendChild(tr);
+        });
+
+        runBtn.disabled = false;
+        resetBtn.disabled = false;
+      }
+
+      // Add process
+      addForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        errorMessage.textContent = "";
+
+        let bt = parseInt(btInput.value);
+        let at = parseInt(atInput.value);
+
+        if (bt <= 0 || at < 0) {
+          errorMessage.textContent = "Invalid burst / arrival time!";
+          return;
+        }
+
+        processes.push({
+          id: "P" + processIdCounter++,
+          burst: bt,
+          arrival: at
+        });
+
+        btInput.value = "";
+        atInput.value = "";
+        refreshProcessList();
+      });
+
+      // SJF Simulation
+      runBtn.addEventListener("click", () => {
+
+        const n = processes.length;
+        let time = 0;
+        let completed = 0;
+        const execLog = [];
+
+        const procCopy = processes.map(p => ({ ...p, remaining: p.burst, start: -1, completion: 0 }));
+        procCopy.sort((a, b) => a.arrival - b.arrival);
+
+        while (completed < n) {
+          let candidates = procCopy.filter(p => p.arrival <= time && p.remaining > 0);
+
+          if (candidates.length === 0) {
+            execLog.push({ id: "IDLE", start: time, end: time + 1 });
+            time++;
+            continue;
+          }
+
+          candidates.sort((a, b) => a.remaining - b.remaining);
+          let p = candidates[0];
+
+          if (p.start === -1) p.start = time;
+
+          execLog.push({ id: p.id, start: time, end: time + p.remaining });
+
+          time += p.remaining;
+          p.remaining = 0;
+          p.completion = time;
+
+          completed++;
+        }
+
+        const results = procCopy.map(p => ({
+          id: p.id,
+          burst: p.burst,
+          arrival: p.arrival,
+          start: p.start,
+          completion: p.completion,
+          turnaround: p.completion - p.arrival,
+          waiting: p.start - p.arrival
+        }));
+
+        renderGantt(execLog);
+        renderResults(results);
+        outputSection.classList.remove("hidden");
+      });
+
+      // Render Gantt Chart
+      function renderGantt(logs) {
+        ganttChart.innerHTML = "";
+        ganttTime.innerHTML = "";
+
+        const totalTime = logs[logs.length - 1].end;
+
+        logs.forEach((entry, index) => {
+          const width = ((entry.end - entry.start) / totalTime) * 100;
+
+          const block = document.createElement("div");
+          block.style.width = width + "%";
+          block.className =
+            "h-full flex justify-center items-center text-white " +
+            (entry.id === "IDLE" ? "bg-gray-400" : COLORS[index % COLORS.length]);
+
+          block.textContent = entry.id;
+          ganttChart.appendChild(block);
+
+          const marker = document.createElement("span");
+          marker.className = "absolute text-xs";
+          marker.style.left = (entry.end / totalTime) * 100 + "%";
+          marker.textContent = entry.end;
+          ganttTime.appendChild(marker);
+        });
+      }
+
+      // Render Results Table
+      function renderResults(results) {
+        resultsTableBody.innerHTML = "";
+
+        let totalTurnaround = 0;
+        let totalWaiting = 0;
+
+        results.forEach(r => {
+          totalTurnaround += r.turnaround;
+          totalWaiting += r.waiting;
+
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td class="px-4 py-2">${r.id}</td>
+            <td class="px-4 py-2">${r.burst}</td>
+            <td class="px-4 py-2">${r.arrival}</td>
+            <td class="px-4 py-2">${r.start}</td>
+            <td class="px-4 py-2">${r.completion}</td>
+            <td class="px-4 py-2">${r.turnaround}</td>
+            <td class="px-4 py-2">${r.waiting}</td>
+          `;
+          resultsTableBody.appendChild(tr);
+        });
+
+        averageResults.innerHTML = `
+          <div class="p-4 bg-blue-100 rounded-lg">
+            <p class="text-sm text-blue-800">Average Turnaround Time</p>
+            <p class="text-2xl font-bold text-blue-900">${(totalTurnaround / results.length).toFixed(2)}</p>
+          </div>
+
+          <div class="p-4 bg-green-100 rounded-lg">
+            <p class="text-sm text-green-800">Average Waiting Time</p>
+            <p class="text-2xl font-bold text-green-900">${(totalWaiting / results.length).toFixed(2)}</p>
+          </div>
+        `;
+      }
+
+      // Reset
+      resetBtn.addEventListener("click", () => {
+        processes = [];
+        processIdCounter = 1;
+
+        ganttChart.innerHTML = "";
+        ganttTime.innerHTML = "";
+        resultsTableBody.innerHTML = "";
+        averageResults.innerHTML = "";
+        outputSection.classList.add("hidden");
+
+        btInput.value = "";
+        atInput.value = "";
+
+        refreshProcessList();
+      });
+
+      refreshProcessList();
+    });
+  </script>
+</body>
+</html>

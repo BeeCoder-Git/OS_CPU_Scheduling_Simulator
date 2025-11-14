@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FCFS CPU Scheduling Simulator (Arrival Time)</title>
+
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://rsms.me">
+  <link href="https://rsms.me/inter/inter.css" rel="stylesheet">
+
+  <style>
+    html { font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; }
+    /* small helpers for the gantt/time markers */
+    #gantt-chart { min-height: 3.5rem; }
+    #gantt-time { height: 1.25rem; }
+    /* ensure the gantt time container is positioned for absolute markers */
+    .gantt-time-relative { position: relative; }
+    /* clip long text in small blocks */
+    .truncate-sm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+  <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+    <!-- Header -->
+    <div class="bg-gradient-to-r from-sky-600 to-indigo-700 p-6">
+      <h1 class="text-3xl md:text-4xl font-extrabold text-white text-center">FCFS CPU Scheduling Simulator</h1>
+      <p class="text-center text-sky-100 mt-1">First-Come, First-Served (with Arrival Time)</p>
+    </div>
+
+    <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+      <!-- Left: Input & Process List -->
+      <div class="flex flex-col gap-6">
+        <!-- Input -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Add Process</h2>
+
+          <form id="add-process-form" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+            <div>
+              <label for="burst-time" class="block text-sm font-medium text-gray-700">Burst Time</label>
+              <input id="burst-time" type="number" min="1" step="1" required
+                     placeholder="e.g., 5"
+                     class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+            </div>
+
+            <div>
+              <label for="arrival-time" class="block text-sm font-medium text-gray-700">Arrival Time</label>
+              <input id="arrival-time" type="number" min="0" step="1" required
+                     placeholder="e.g., 2"
+                     class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent" />
+            </div>
+
+            <div>
+              <button type="submit"
+                      class="w-full bg-sky-600 text-white font-medium px-4 py-2 rounded-lg shadow hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500">
+                Add Process
+              </button>
+            </div>
+          </form>
+
+          <p id="error-message" class="text-red-500 text-sm mt-3"></p>
+        </div>
+
+        <!-- Process Queue -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 flex-grow">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-xl font-semibold text-gray-800">Process Queue</h2>
+            <p class="text-sm text-gray-500">Shown in the order they were added</p>
+          </div>
+
+          <div class="overflow-x-auto max-h-80 overflow-y-auto">
+            <table class="w-full min-w-[480px]">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Process ID</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Burst Time</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Arrival Time</th>
+                </tr>
+              </thead>
+              <tbody id="process-list-body" class="bg-white divide-y divide-gray-200">
+                <tr id="no-process-row">
+                  <td colspan="3" class="px-4 py-3 text-sm text-gray-500 text-center">No processes added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Controls -->
+          <div class="flex gap-3 mt-4">
+            <button id="run-simulation" disabled
+                    class="flex-1 bg-green-600 text-white font-medium px-5 py-2 rounded-lg shadow-md hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-green-500">
+              Run Simulation
+            </button>
+            <button id="reset-simulation" disabled
+                    class="flex-1 bg-red-600 text-white font-medium px-5 py-2 rounded-lg shadow-md hover:bg-red-700 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-red-500">
+              Reset
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Output & Visualization -->
+      <div id="output-section" class="flex flex-col gap-6 hidden">
+        <!-- Gantt Chart -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Gantt Chart</h2>
+
+          <div id="gantt-chart" class="w-full flex h-14 rounded-lg overflow-hidden border-2 border-gray-300 bg-gray-200"></div>
+
+          <div id="gantt-time" class="relative w-full mt-2 text-sm font-medium h-6 gantt-time-relative"></div>
+        </div>
+
+        <!-- Results Table -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 overflow-x-auto">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Simulation Results</h2>
+
+          <table class="w-full min-w-[640px]">
+            <thead class="bg-gray-200">
+              <tr>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Process</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Burst</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Arrival</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Start</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Completion</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Turnaround</th>
+                <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Waiting</th>
+              </tr>
+            </thead>
+            <tbody id="results-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+          </table>
+        </div>
+
+        <!-- Average Stats -->
+        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
+          <h2 class="text-xl font-semibold mb-4 text-gray-800">Average Statistics</h2>
+          <div id="average-results" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // State
+      let processes = [];                 // stores in order added: { id, burstTime, arrivalTime, addIndex }
+      let processIdCounter = 1;
+
+      const GANTT_COLORS = [
+        'bg-blue-600','bg-green-600','bg-red-600','bg-yellow-500','bg-purple-600',
+        'bg-pink-500','bg-indigo-600','bg-teal-600','bg-orange-500','bg-cyan-600'
+      ];
+
+      // DOM
+      const addProcessForm = document.getElementById('add-process-form');
+      const burstTimeInput = document.getElementById('burst-time');
+      const arrivalTimeInput = document.getElementById('arrival-time');
+      const errorMessage = document.getElementById('error-message');
+
+      const processListBody = document.getElementById('process-list-body');
+      const noProcessRow = document.getElementById('no-process-row');
+
+      const runButton = document.getElementById('run-simulation');
+      const resetButton = document.getElementById('reset-simulation');
+
+      const outputSection = document.getElementById('output-section');
+      const ganttChart = document.getElementById('gantt-chart');
+      const ganttTime = document.getElementById('gantt-time');
+      const resultsTableBody = document.getElementById('results-table-body');
+      const averageResults = document.getElementById('average-results');
+
+      // Helpers
+      function updateProcessList() {
+        processListBody.innerHTML = '';
+        if (processes.length === 0) {
+          processListBody.appendChild(noProcessRow);
+          runButton.disabled = true;
+          resetButton.disabled = true;
+          return;
+        }
+        processes.forEach(p => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-4 py-3 text-sm text-gray-800">${p.id}</td>
+            <td class="px-4 py-3 text-sm text-gray-800">${p.burstTime}</td>
+            <td class="px-4 py-3 text-sm text-gray-800">${p.arrivalTime}</td>
+          `;
+          processListBody.appendChild(tr);
+        });
+        runButton.disabled = false;
+        resetButton.disabled = false;
+      }
+
+      // Add process
+      addProcessForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        errorMessage.textContent = '';
+
+        const bt = parseInt(burstTimeInput.value, 10);
+        const at = parseInt(arrivalTimeInput.value, 10);
+
+        if (Number.isNaN(bt) || bt <= 0) {
+          errorMessage.textContent = 'Please enter a valid burst time (integer > 0).';
+          return;
+        }
+        if (Number.isNaN(at) || at < 0) {
+          errorMessage.textContent = 'Please enter a valid arrival time (integer ≥ 0).';
+          return;
+        }
+
+        processes.push({
+          id: `P${processIdCounter++}`,
+          burstTime: bt,
+          arrivalTime: at,
+          addIndex: processes.length // preserve insertion order for stability
+        });
+
+        burstTimeInput.value = '';
+        arrivalTimeInput.value = '';
+        burstTimeInput.focus();
+
+        outputSection.classList.add('hidden'); // hide previous output when list changes
+        updateProcessList();
+      });
+
+      // Run simulation
+      runButton.addEventListener('click', () => {
+        if (processes.length === 0) return;
+
+        // Sort by arrivalTime, stable: if arrival equal, use addIndex
+        const sorted = [...processes].sort((a,b) => {
+          if (a.arrivalTime !== b.arrivalTime) return a.arrivalTime - b.arrivalTime;
+          return a.addIndex - b.addIndex;
+        });
+
+        let currentTime = 0;
+        const results = [];
+
+        for (let p of sorted) {
+          const startTime = Math.max(currentTime, p.arrivalTime);
+          const completionTime = startTime + p.burstTime;
+          const turnaroundTime = completionTime - p.arrivalTime;
+          const waitingTime = startTime - p.arrivalTime;
+
+          results.push({
+            id: p.id,
+            burstTime: p.burstTime,
+            arrivalTime: p.arrivalTime,
+            startTime,
+            completionTime,
+            turnaroundTime,
+            waitingTime
+          });
+
+          currentTime = completionTime;
+        }
+
+        // Compute averages
+        const totalTAT = results.reduce((acc,r) => acc + r.turnaroundTime, 0);
+        const totalWT  = results.reduce((acc,r) => acc + r.waitingTime, 0);
+        const avgTAT = totalTAT / results.length;
+        const avgWT  = totalWT  / results.length;
+
+        renderGantt(results);
+        renderResultsTable(results);
+        renderAverages(avgTAT, avgWT);
+
+        outputSection.classList.remove('hidden');
+      });
+
+      // Render Gantt (handles idle blocks)
+      function renderGantt(results) {
+        ganttChart.innerHTML = '';
+        ganttTime.innerHTML = '';
+
+        if (results.length === 0) return;
+
+        const timelineStart = 0;
+        const timelineEnd = results[results.length - 1].completionTime;
+        const totalSpan = Math.max(1, timelineEnd - timelineStart); // avoid division by zero
+
+        // Add starting '0' marker
+        const zeroMarker = document.createElement('span');
+        zeroMarker.className = 'absolute -ml-1 text-xs font-medium text-gray-700';
+        zeroMarker.style.left = '0%';
+        zeroMarker.textContent = '0';
+        ganttTime.appendChild(zeroMarker);
+
+        // Build chart blocks including idle gaps
+        let lastTime = timelineStart;
+        results.forEach((r, idx) => {
+          // idle before this process?
+          if (r.startTime > lastTime) {
+            const idleDuration = r.startTime - lastTime;
+            const idleWidthPct = (idleDuration / totalSpan) * 100;
+
+            const idleBlock = document.createElement('div');
+            idleBlock.style.width = `${idleWidthPct}%`;
+            idleBlock.className = 'h-full flex items-center justify-center text-xs text-gray-800 bg-gray-400/60';
+            idleBlock.textContent = 'IDLE';
+            ganttChart.appendChild(idleBlock);
+          }
+
+          // process block
+          const procWidthPct = (r.burstTime / totalSpan) * 100;
+          const procBlock = document.createElement('div');
+          procBlock.style.width = `${procWidthPct}%`;
+          procBlock.className = `h-full flex items-center justify-center text-white text-sm font-semibold ${GANTT_COLORS[idx % GANTT_COLORS.length]} truncate-sm`;
+          procBlock.textContent = r.id;
+          ganttChart.appendChild(procBlock);
+
+          // completion time marker
+          const marker = document.createElement('span');
+          marker.className = 'absolute text-xs font-medium text-gray-700';
+          // left percentage relative to timeline start
+          const leftPct = ((r.completionTime - timelineStart) / totalSpan) * 100;
+          marker.style.left = `calc(${leftPct}% )`;
+
+          // small horizontal adjustment for two/three-digit numbers
+          if (r.completionTime >= 100) marker.style.transform = 'translateX(-1.25rem)';
+          else if (r.completionTime >= 10) marker.style.transform = 'translateX(-0.75rem)';
+          else marker.style.transform = 'translateX(-0.4rem)';
+
+          marker.textContent = r.completionTime;
+          ganttTime.appendChild(marker);
+
+          lastTime = r.completionTime;
+        });
+
+        // Ensure final time label (if not already present)
+        const finalTime = timelineEnd;
+        // (Already appended as last completion marker)
+      }
+
+      // Render results table
+      function renderResultsTable(results) {
+        resultsTableBody.innerHTML = '';
+        results.forEach(r => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td class="px-4 py-2 text-sm text-gray-800">${r.id}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">${r.burstTime}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">${r.arrivalTime}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">${r.startTime}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">${r.completionTime}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">${r.turnaroundTime}</td>
+            <td class="px-4 py-2 text-sm text-gray-800">${r.waitingTime}</td>
+          `;
+          resultsTableBody.appendChild(tr);
+        });
+      }
+
+      // Render averages
+      function renderAverages(avgTAT, avgWT) {
+        averageResults.innerHTML = `
+          <div class="p-4 bg-sky-100 rounded-lg">
+            <p class="text-sm font-medium text-sky-800">Average Turnaround Time</p>
+            <p class="text-2xl font-bold text-sky-900">${avgTAT.toFixed(2)}</p>
+          </div>
+          <div class="p-4 bg-green-100 rounded-lg">
+            <p class="text-sm font-medium text-green-800">Average Waiting Time</p>
+            <p class="text-2xl font-bold text-green-900">${avgWT.toFixed(2)}</p>
+          </div>
+        `;
+      }
+
+      // Reset
+      resetButton.addEventListener('click', () => {
+        processes = [];
+        processIdCounter = 1;
+        updateProcessList();
+
+        // clear outputs
+        outputSection.classList.add('hidden');
+        ganttChart.innerHTML = '';
+        ganttTime.innerHTML = '';
+        resultsTableBody.innerHTML = '';
+        averageResults.innerHTML = '';
+        errorMessage.textContent = '';
+        burstTimeInput.value = '';
+        arrivalTimeInput.value = '';
+      });
+
+      // Init
+      updateProcessList();
+    });
+  </script>
+</body>
+</html>
