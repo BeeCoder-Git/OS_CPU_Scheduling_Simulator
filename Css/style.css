@@ -1,0 +1,145 @@
+/* GLOBAL STYLES */
+body {
+  background: #0f0f17;
+  color: white;
+  font-family: 'Inter', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+/* ---------------------------
+   HERO SECTION
+----------------------------*/
+.hero-section {
+  min-height: 100vh;
+  text-align: center;
+  padding: 0 20px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.gradient-bg {
+  position: absolute;
+  top: -50px;
+  width: 900px;
+  height: 900px;
+  background: radial-gradient(circle, rgba(123,31,255,0.7), rgba(0,0,0,0));
+  filter: blur(200px);
+  z-index: -1;
+}
+
+.hero-title {
+  font-size: 3rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: 4rem;
+  }
+}
+
+.hero-subtitle {
+  margin-top: 15px;
+  font-size: 1.2rem;
+  color: #c8b1ff;
+  max-width: 550px;
+}
+
+.explore-btn {
+  margin-top: 35px;
+  padding: 12px 35px;
+  background: #7c3aed;
+  color: white;
+  border-radius: 10px;
+  font-weight: 600;
+  display: inline-block;
+  text-decoration: none;
+  transition: 0.3s;
+  box-shadow: 0px 0px 15px rgba(124, 58, 237, 0.4);
+}
+
+.explore-btn:hover {
+  background: #6d28d9;
+  transform: translateY(-3px);
+}
+
+/* ---------------------------
+   SIMULATOR SECTION
+----------------------------*/
+.sim-section {
+  padding: 80px 20px;
+  background: rgba(20, 20, 30, 0.7);
+  backdrop-filter: blur(10px);
+}
+
+.section-title {
+  text-align: center;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+/* GRID */
+.cards-box {
+  max-width: 1100px;
+  margin: auto;
+  display: grid;
+  gap: 25px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+/* CARD STYLING */
+.sim-card {
+  padding: 25px;
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  text-decoration: none;
+  color: white;
+  transition: 0.3s;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+}
+
+.sim-card h3 {
+  font-size: 1.7rem;
+  font-weight: 700;
+}
+
+.sim-card p {
+  font-size: 0.95rem;
+  color: #c8b1ff;
+  margin-top: 8px;
+}
+
+/* Hover Effects */
+.sim-card:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: translateY(-5px) scale(1.03);
+  box-shadow: 0 0 25px rgba(124, 58, 237, 0.4);
+}
+
+/* ---------------------------
+   FOOTER
+----------------------------*/
+.footer {
+  text-align: center;
+  padding: 20px;
+  color: #bfaaff;
+  font-size: 0.9rem;
+}
+
+.footer span {
+  color: #d3b3ff;
+  font-weight: 700;
+}
+.footer a {
+  color: #d3b3ff;
+  text-decoration: none;
+}
