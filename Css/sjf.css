@@ -1,0 +1,25 @@
+html {
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+}
+
+#gantt-chart {
+  min-height: 3.5rem;
+}
+
+#gantt-time {
+  height: 1.25rem;
+}
+
+.gantt-time-relative {
+  position: relative;
+}
+.gantt-time-relative .gantt-time-label {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+}
+.gantt-time-relative .gantt-time-label-hidden {
+  display: none;
+}
