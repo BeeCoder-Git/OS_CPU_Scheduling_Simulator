@@ -8,131 +8,142 @@
   <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Inter font -->
+  <!-- Inter Font -->
   <link rel="preconnect" href="https://rsms.me">
   <link href="https://rsms.me/inter/inter.css" rel="stylesheet">
 
-  <!-- External CSS -->
+  <!-- Custom CSS -->
   <link rel="stylesheet" href="Css/sjf.css">
 </head>
 
-<body class="bg-gray-100 min-h-screen p-4 md:p-8">
-  <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-2xl overflow-hidden">
+<body class="bg-slate-950 text-white min-h-screen p-5">
+
+  <!-- Purple Glow Background -->
+  <div class="absolute inset-0 -z-10 opacity-40">
+    <div class="absolute top-40 left-1/2 transform -translate-x-1/2 w-[700px] h-[700px] bg-purple-600 blur-[200px] rounded-full"></div>
+  </div>
+
+  <div class="max-w-6xl mx-auto rounded-2xl overflow-hidden">
 
     <!-- Header -->
-    <div class="bg-gradient-to-r from-indigo-600 to-purple-700 p-6">
-      <h1 class="text-3xl md:text-4xl font-extrabold text-white text-center">
-        SJF (Non-Preemptive) CPU Scheduling Simulator
+    <div class="text-center py-10">
+      <h1 class="text-4xl md:text-5xl font-extrabold">
+        SJF (Non-Preemptive) CPU Scheduling
       </h1>
-      <p class="text-center text-indigo-100 mt-1">With Arrival Time</p>
+      <p class="text-purple-300 mt-2">Shortest Job First with Arrival Time</p>
     </div>
 
-    <div class="p-6 md:p-8 grid grid-cols-1 md:grid-cols-2 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-10 p-4">
 
-      <!-- Left Panel -->
+      <!-- LEFT PANEL -->
       <div class="flex flex-col gap-6">
 
-        <!-- Input -->
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-          <h2 class="text-xl font-semibold mb-4 text-gray-800">Add Process</h2>
+        <!-- PROCESS INPUT CARD -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl">
 
-          <form id="add-process-form" class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+          <h2 class="text-2xl font-semibold mb-4">Add Process</h2>
+
+          <form id="add-process-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            
             <div>
-              <label class="block text-sm font-medium text-gray-700">Burst Time</label>
+              <label class="label">Burst Time</label>
               <input id="burst-time" type="number" min="1" step="1" required
-                     class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
+                     class="input-field" placeholder="e.g. 5">
             </div>
 
             <div>
-              <label class="block text-sm font-medium text-gray-700">Arrival Time</label>
+              <label class="label">Arrival Time</label>
               <input id="arrival-time" type="number" min="0" step="1" required
-                     class="mt-1 w-full px-3 py-2 border border-gray-300 rounded-lg">
+                     class="input-field" placeholder="e.g. 2">
             </div>
 
-            <div>
-              <button type="submit"
-                      class="w-full bg-indigo-600 text-white px-4 py-2 rounded-lg shadow hover:bg-indigo-700">
-                Add
-              </button>
-            </div>
+            <button type="submit" class="btn-purple w-full">
+              Add
+            </button>
+
           </form>
 
-          <p id="error-message" class="text-red-500 text-sm mt-3"></p>
+          <p id="error-message" class="text-red-400 text-sm mt-3"></p>
         </div>
 
-        <!-- Process Table -->
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 flex-grow">
-          <h2 class="text-xl font-semibold text-gray-800 mb-3">Process Queue</h2>
+        <!-- PROCESS LIST -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl flex-grow">
+
+          <h2 class="text-2xl font-semibold mb-4">Process Queue</h2>
 
           <div class="overflow-x-auto max-h-80 overflow-y-auto">
             <table class="w-full min-w-[480px]">
-              <thead class="bg-gray-200">
+              <thead class="bg-white/10">
                 <tr>
-                  <th class="px-4 py-2">Process</th>
-                  <th class="px-4 py-2">Burst</th>
-                  <th class="px-4 py-2">Arrival</th>
+                  <th class="table-head">Process</th>
+                  <th class="table-head">Burst</th>
+                  <th class="table-head">Arrival</th>
                 </tr>
               </thead>
-              <tbody id="process-list-body" class="bg-white divide-y divide-gray-200">
+
+              <tbody id="process-list-body" class="divide-y divide-white/10">
                 <tr id="no-process-row">
-                  <td colspan="3" class="px-4 py-3 text-center text-gray-500">No processes yet.</td>
+                  <td colspan="3" class="px-4 py-3 text-center text-white/50">No processes yet.</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
+          <!-- Buttons -->
           <div class="flex gap-3 mt-4">
-            <button id="run-simulation" disabled
-                    class="flex-1 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700">
+            <button id="run-simulation" disabled class="btn-green-disabled flex-1">
               Run Simulation
             </button>
-            <button id="reset-simulation" disabled
-                    class="flex-1 bg-red-600 text-white px-5 py-2 rounded-lg hover:bg-red-700">
+
+            <button id="reset-simulation" disabled class="btn-red-disabled flex-1">
               Reset
             </button>
           </div>
         </div>
+
       </div>
 
-      <!-- Right Panel -->
-      <div id="output-section" class="flex flex-col gap-6 hidden">
+      <!-- RIGHT PANEL -->
+      <div id="output-section" class="flex flex-col gap-8 hidden">
 
-        <!-- Gantt Chart -->
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-          <h2 class="text-xl font-semibold mb-4">Gantt Chart</h2>
-          <div id="gantt-chart" class="w-full flex h-14 rounded-lg overflow-hidden border-2 bg-gray-200"></div>
-          <div id="gantt-time" class="relative w-full mt-2 text-sm font-medium h-6 gantt-time-relative"></div>
+        <!-- GANTT CHART -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl">
+          <h2 class="text-2xl font-semibold mb-4">Gantt Chart</h2>
+          <div id="gantt-chart" class="gantt-chart"></div>
+          <div id="gantt-time" class="gantt-time"></div>
         </div>
 
-        <!-- Results Table -->
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200 overflow-x-auto">
-          <h2 class="text-xl font-semibold mb-4">Simulation Results</h2>
+        <!-- RESULTS TABLE -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl overflow-x-auto">
+          <h2 class="text-2xl font-semibold mb-4">Simulation Results</h2>
           <table class="w-full min-w-[640px]">
-            <thead class="bg-gray-200">
+            <thead class="bg-white/10">
               <tr>
-                <th class="px-4 py-2">Process</th>
-                <th class="px-4 py-2">Burst</th>
-                <th class="px-4 py-2">Arrival</th>
-                <th class="px-4 py-2">Start</th>
-                <th class="px-4 py-2">Completion</th>
-                <th class="px-4 py-2">Turnaround</th>
-                <th class="px-4 py-2">Waiting</th>
+                <th class="table-head">Process</th>
+                <th class="table-head">Burst</th>
+                <th class="table-head">Arrival</th>
+                <th class="table-head">Start</th>
+                <th class="table-head">Completion</th>
+                <th class="table-head">Turnaround</th>
+                <th class="table-head">Waiting</th>
               </tr>
             </thead>
-            <tbody id="results-table-body" class="bg-white divide-y divide-gray-200"></tbody>
+
+            <tbody id="results-table-body"></tbody>
           </table>
         </div>
 
-        <!-- Averages -->
-        <div class="bg-gray-50 p-5 rounded-lg border border-gray-200">
-          <h2 class="text-xl font-semibold mb-4">Average Statistics</h2>
+        <!-- AVERAGES -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl">
+          <h2 class="text-2xl font-semibold mb-4">Average Statistics</h2>
           <div id="average-results" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
         </div>
+
       </div>
+
     </div>
   </div>
 
-  <!-- External JS -->
   <script src="Js/sjf.js"></script>
 </body>
 </html>
