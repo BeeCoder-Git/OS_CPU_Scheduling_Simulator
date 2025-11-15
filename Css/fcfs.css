@@ -1,95 +1,92 @@
-html { 
-  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+html {
+  font-family: 'Inter', sans-serif;
 }
 
-#gantt-chart { 
-  min-height: 3.5rem; 
-}
-
-#gantt-time { 
-  height: 1.25rem; 
-}
-
-.gantt-time-relative { 
-  position: relative; 
-}
-
-.truncate-sm { 
-  overflow: hidden; 
-  text-overflow: ellipsis; 
-  white-space: nowrap; 
+/* Glass Card */
+.glass-card {
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 /* Inputs */
 .input-field {
   margin-top: 0.25rem;
   width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 0.5rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 0.6rem;
+  border: 1px solid rgba(255,255,255,0.2);
+  background: rgba(255,255,255,0.1);
+  color: white;
 }
-
 .input-field:focus {
   outline: none;
-  border-color: transparent;
-  box-shadow: 0 0 0 2px #0ea5e9;
+  border-color: #a855f7;
+  box-shadow: 0 0 0 2px #a855f7;
+}
+
+/* Labels */
+.label {
+  font-size: 0.85rem;
+  color: #d1c2ff;
 }
 
 /* Buttons */
-.btn-sky {
-  width: 100%;
-  background-color: #0284c7;
+.btn-purple {
+  background: linear-gradient(to right, #7c3aed, #9333ea);
+  padding: 0.55rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
   color: white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
+  transition: 0.2s;
+}
+.btn-purple:hover {
+  opacity: 0.9;
 }
 
 .btn-green-disabled,
 .btn-red-disabled {
-  flex: 1;
+  padding: 0.55rem;
+  border-radius: 0.6rem;
+  font-weight: 600;
   color: white;
-  padding: 0.5rem;
-  border-radius: 0.5rem;
 }
 
-.btn-green-disabled {
-  background-color: #16a34a;
-}
-
-.btn-red-disabled {
-  background-color: #dc2626;
-}
+.btn-green-disabled { background: #22c55e; }
+.btn-red-disabled { background: #ef4444; }
 
 .btn-green-disabled:disabled,
 .btn-red-disabled:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
-}
-
-/* Gantt */
-.gantt-chart {
-  width: 100%;
-  display: flex;
-  height: 3.5rem;
-  border-radius: 0.5rem;
-  overflow: hidden;
-  border: 2px solid #d1d5db;
-  background-color: #e5e7eb;
-}
-
-.gantt-time {
-  position: relative;
-  width: 100%;
-  margin-top: 0.5rem;
-  font-size: 0.875rem;
-  font-weight: 500;
 }
 
 /* Table */
 .table-head {
-  padding: 0.5rem 1rem;
+  padding: 0.6rem 1rem;
   text-align: left;
-  font-size: 0.875rem;
+  color: #e5e7eb;
+  font-size: 0.9rem;
   font-weight: 600;
-  color: #374151;
+}
+
+/* Gantt */
+.gantt-chart {
+  height: 3.6rem;
+  display: flex;
+  border-radius: 0.6rem;
+  overflow: hidden;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.gantt-time {
+  margin-top: 0.5rem;
+  position: relative;
+  font-size: 0.8rem;
+}
+
+/* Mobile Fixes */
+@media (max-width: 480px) {
+  .table-head { font-size: 0.75rem; }
+  .input-field { padding: 0.45rem; }
 }
