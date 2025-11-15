@@ -54,10 +54,10 @@ It helps students and educators **visualize process execution**, understand sche
 ![SJF Screenshot](./assets/screenshots/sjf_placeholder.png)
 
 ### 🔹SJTR Simulator
-![SJTR Screenshot](./assets/screenshots/round_robin_placeholder.png)
+![SJTR Screenshot](./assets/screenshots/sjtr_placeholder.png)
 
 ### 🔹PRIORITY Simulator
-![PRIORITY Screenshot](./assets/screenshots/round_robin_placeholder.png)
+![PRIORITY Screenshot](./assets/screenshots/priority_placeholder.png)
 
 ### 🔹 Round Robin Simulator  
 ![RR Screenshot](./assets/screenshots/round_robin_placeholder.png)
