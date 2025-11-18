@@ -48,18 +48,21 @@ It helps students and educators **visualize process execution**, understand sche
 ## 🖼️ Screenshots (You can replace these with real images)
 
 ### 🔹 FCFS Simulator  
-![FCFS Screenshot](./assets/screenshots/fcfs_placeholder.png)
+![FCFS Screenshot](./assets/screenshots/FCFS_IMG.png)
 
 ### 🔹 SJF Simulator  
-![SJF Screenshot](./assets/screenshots/sjf_placeholder.png)
+![SJF Screenshot](./assets/screenshots/SJF_IMG.png)
 
 ### 🔹SJTR Simulator
-![SJTR Screenshot](./assets/screenshots/sjtr_placeholder.png)
+![SJTR Screenshot](./assets/screenshots/SRTF_IMG.png)
 
 ### 🔹PRIORITY Simulator
-![PRIORITY Screenshot](./assets/screenshots/priority_placeholder.png)
+##### 👉 PRIORITY(Preemptive)
+![PRIORITY(Preemptive) Screenshot](./assets/screenshots/Priority_P_IMG.png)
+##### 👉 PRIORITY(Non-Preemptive)
+![PRIORITY(Non-Preemptive) Screenshot](./assets/screenshots/Priority_NP_IMG.png)
 
 ### 🔹 Round Robin Simulator  
-![RR Screenshot](./assets/screenshots/round_robin_placeholder.png)
+![RR Screenshot](./assets/screenshots/RR_IMG.png)
 
 ---
