@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SRTF CPU Scheduling Simulator</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Inter font -->
+  <link rel="preconnect" href="https://rsms.me">
+  <link href="https://rsms.me/inter/inter.css" rel="stylesheet" />
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="Css/srtf.css" />
+</head>
+
+<body class="bg-slate-950 text-white min-h-screen">
+
+  <!-- Top Header Section -->
+  <header class="relative py-12 text-center">
+    <!-- Purple Glow -->
+    <div class="absolute inset-0 -z-10 opacity-40">
+      <div class="absolute top-20 left-1/2 transform -translate-x-1/2 w-[600px] h-[600px] bg-purple-600 blur-[200px] rounded-full"></div>
+    </div>
+
+    <h1 class="text-4xl md:text-5xl font-extrabold drop-shadow-lg">
+      SRTF CPU Scheduling Simulator
+    </h1>
+    <p class="text-purple-300 mt-2 text-lg">
+      Shortest Remaining Time First (Preemptive)
+    </p>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 pb-16 grid grid-cols-1 md:grid-cols-2 gap-10">
+
+    <!-- LEFT PANEL -->
+    <div class="flex flex-col gap-6">
+
+        <!-- PROCESS INPUT CARD -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl">
+
+          <h2 class="text-2xl font-semibold mb-4">Add Process</h2>
+
+          <form id="add-process-form" class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-end">
+            
+            <div>
+              <label class="label">Burst Time</label>
+              <input id="burst-time" type="number" min="1" step="1" required
+                     class="input-field" placeholder="e.g. 5">
+            </div>
+
+            <div>
+              <label class="label">Arrival Time</label>
+              <input id="arrival-time" type="number" min="0" step="1" required
+                     class="input-field" placeholder="e.g. 2">
+            </div>
+
+            <button type="submit" class="btn-purple w-full">
+              Add
+            </button>
+
+          </form>
+
+          <p id="error-message" class="text-red-400 text-sm mt-3"></p>
+        </div>
+
+        <!-- PROCESS LIST -->
+        <div class="glass-card p-6 rounded-2xl border border-white/10 shadow-xl flex-grow">
+
+          <h2 class="text-2xl font-semibold mb-4">Process Queue</h2>
+
+          <div class="overflow-x-auto max-h-80 overflow-y-auto">
+            <table class="w-full min-w-[480px]">
+              <thead class="bg-white/10">
+                <tr>
+                  <th class="table-head">Process</th>
+                  <th class="table-head">Burst</th>
+                  <th class="table-head">Arrival</th>
+                </tr>
+              </thead>
+
+              <tbody id="process-list-body" class="divide-y divide-white/10">
+                <tr id="no-process-row">
+                  <td colspan="3" class="px-4 py-3 text-center text-white/50">No processes yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex gap-3 mt-4">
+            <button id="run-simulation" disabled class="btn-green-disabled flex-1">
+              Run Simulation
+            </button>
+
+            <button id="reset-simulation" disabled class="btn-red-disabled flex-1">
+              Reset
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+    <!-- RIGHT PANEL -->
+    <section id="output-section" class="hidden flex flex-col gap-8">
+
+      <!-- Gantt Chart -->
+      <div class="glass-card p-6 rounded-2xl border border-white/10">
+        <h2 class="text-2xl font-semibold mb-4">Gantt Chart</h2>
+        <div id="gantt-chart" class="gantt-chart"></div>
+        <div id="gantt-time" class="gantt-time"></div>
+      </div>
+
+      <!-- Results Table -->
+      <div class="glass-card p-6 rounded-2xl border border-white/10 overflow-x-auto">
+        <h2 class="text-2xl font-semibold mb-4">Simulation Results</h2>
+
+        <table class="w-full min-w-[640px]">
+          <thead class="bg-white/10">
+            <tr>
+              <th class="table-head">Process</th>
+              <th class="table-head">Burst</th>
+              <th class="table-head">Arrival</th>
+              <th class="table-head">Start</th>
+              <th class="table-head">Completion</th>
+              <th class="table-head">Turnaround</th>
+              <th class="table-head">Waiting</th>
+            </tr>
+          </thead>
+          <tbody id="results-table-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Averages -->
+      <div class="glass-card p-6 rounded-2xl border border-white/10">
+        <h2 class="text-2xl font-semibold mb-4">Average Statistics</h2>
+        <div id="average-results" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- Script -->
+  <script src="Js/srtf.js"></script>
+
+</body>
+</html>
