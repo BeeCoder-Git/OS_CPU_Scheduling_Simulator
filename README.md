@@ -45,7 +45,7 @@ It helps students and educators **visualize process execution**, understand sche
 | Round Robin     | ✔          | ❌              | ✔                    | ✔            | ❌                | ⭐⭐⭐              |
 ---
 
-## 🖼️ Screenshots (You can replace these with real images)
+## 🖼️ Screenshots
 
 ### 🔹 FCFS Simulator  
 ![FCFS Screenshot](./assets/screenshots/FCFS_IMG.png)
